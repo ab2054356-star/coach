@@ -16,7 +16,7 @@ self.addEventListener("fetch", e => {
   if (!same && !font) return;
   // الصفحة نفسها: الجديد من النت، ولو ما في نت من المخزن
   if (same && (r.mode === "navigate" || u.pathname.endsWith("/index.html"))) {
-    e.respondWith(fetch(r).then(res => { const cp = res.clone(); caches.open(V).then(c => c.put("index.html", cp)); return res; })
+    e.respondWith(fetch(r.url, { cache: "no-cache", credentials: "same-origin" }).then(res => { if (res.ok) { const cp = res.clone(); caches.open(V).then(c => c.put("index.html", cp)); } return res; })
       .catch(() => caches.match("index.html")));
     return;
   }

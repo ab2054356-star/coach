@@ -4371,18 +4371,18 @@ function gymMapsAll(){
   return GYM.pos ? "https://www.google.com/maps/search/gym/@" + GYM.pos.lat + "," + GYM.pos.lon + ",14z" : "https://www.google.com/maps/search/gym+near+me";
 }
 async function gymQuery(lat, lon, rad){
-  var q = '[out:json][timeout:10];(' +
+  var q = '[out:json][timeout:15];(' +
     'nwr["leisure"="fitness_centre"](around:' + rad + ',' + lat + ',' + lon + ');' +
     'nwr["amenity"="gym"](around:' + rad + ',' + lat + ',' + lon + ');' +
     'nwr["leisure"="sports_centre"]["sport"~"fitness|weightlifting|crossfit|bodybuilding"](around:' + rad + ',' + lat + ',' + lon + ');' +
     ');out center tags;';
-  /* نسأل السيرفرات الثلاثة بنفس الوقت وناخذ أسرع واحد، وكل واحد له حد 10 ثواني */
+  /* نسأل السيرفرات الثلاثة بنفس الوقت وناخذ أسرع واحد، وكل واحد له حد 16 ثانية */
   var hosts = ["https://overpass-api.de/api/interpreter", "https://overpass.private.coffee/api/interpreter", "https://maps.mail.ru/osm/tools/overpass/api/interpreter"];
   var ctls = hosts.map(function(){ return new AbortController(); });
   return new Promise(function(res, rej){
     var left = hosts.length, done = false;
     hosts.forEach(function(h, i){
-      var tm = setTimeout(function(){ ctls[i].abort(); }, 10000);
+      var tm = setTimeout(function(){ ctls[i].abort(); }, 16000);
       fetch(h, { method:"POST", headers:{ "content-type":"application/x-www-form-urlencoded" }, body:"data=" + encodeURIComponent(q), signal:ctls[i].signal })
         .then(function(r){ if (!r.ok) throw new Error("http " + r.status); return r.json(); })
         .then(function(j){

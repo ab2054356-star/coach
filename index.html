@@ -138,6 +138,11 @@ h1,h2,h3{font-family:"Readex Pro","IBM Plex Sans Arabic",system-ui,sans-serif;fo
 .gym-it{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;padding:10px 12px;border-radius:12px;
   background:color-mix(in srgb,#8B5CF6 7%,transparent);border:1px solid var(--line-soft,var(--line))}
 .gym-it b{font-size:14px;line-height:1.35}
+.gym-hd{display:flex;align-items:center;gap:10px;min-width:0}
+.gym-logo{position:relative;flex:0 0 auto;width:38px;height:38px;border-radius:10px;overflow:hidden;display:grid;place-items:center;
+  background:var(--grad);color:#fff;font-weight:800;font-size:16px;box-shadow:0 0 0 1px var(--line-soft,var(--line))}
+.gym-logo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:5px;background:#fff;opacity:0;transition:opacity .2s}
+.gym-logo.has-img img{opacity:1}
 .gym-it .gym-d{font-size:12.5px;font-weight:700;color:var(--accent-deep);white-space:nowrap}
 .gym-it small{grid-column:1/-1;font-size:12px;color:var(--muted);line-height:1.5}
 .gym-it .gym-acts{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
@@ -4322,9 +4327,25 @@ function gymParse(els, lat, lon){
     var key = (name || "?").toLowerCase() + "|" + la.toFixed(3) + "|" + lo.toFixed(3);
     if (seen[key]) return; seen[key] = 1;
     var adr = [[g["addr:street"], g["addr:housenumber"]].filter(Boolean).join(" "), g["addr:city"]].filter(Boolean).join(", ");
-    out.push({ n:name, lat:la, lon:lo, d:gymDist(lat, lon, la, lo), adr:adr, h:g.opening_hours || "", web:g.website || g["contact:website"] || "" });
+    var web = g.website || g["contact:website"] || "";
+    out.push({ n:name, lat:la, lon:lo, d:gymDist(lat, lon, la, lo), adr:adr, h:g.opening_hours || "", web:web, dom:gymDomain(web, (g.brand || "") + " " + name) });
   });
   return out.sort(function(a, b){ return a.d - b.d; }).slice(0, 12);
+}
+/* شعار النادي: من موقعه، أو من اسم السلسلة لو معروفة */
+var GYM_BRANDS = [["basic-fit","basic-fit.com"],["anytime fitness","anytimefitness.com"],["sportcity","sportcity.nl"],["fit for free","fitforfree.nl"],
+  ["trainmore","trainmore.nl"],["david lloyd","davidlloyd.nl"],["snap fitness","snapfitness.com"],["fitland","fitland.nl"],["puregym","puregym.com"],
+  ["mcfit","mcfit.com"],["jims","jims.nl"],["fit20","fit20.nl"],["crossfit","crossfit.com"],["the gym","thegymgroup.com"],["planet fitness","planetfitness.com"],
+  ["urban gym","urbangym.nl"],["fitness first","fitnessfirst.com"],["clever fit","clever-fit.com"],["kieser","kieser.com"]];
+function gymDomain(web, name){
+  if (web){ try { return new URL(/^https?:/i.test(web) ? web : "https://" + web).hostname.replace(/^www\./, ""); } catch (e) {} }
+  var n = String(name).toLowerCase();
+  for (var i = 0; i < GYM_BRANDS.length; i++) if (n.indexOf(GYM_BRANDS[i][0]) >= 0) return GYM_BRANDS[i][1];
+  return "";
+}
+function gymLogo(g){
+  var L = (String(g.n || t("gymNoName")).replace(/[^\p{L}\p{N}]/gu, "").charAt(0) || "G").toUpperCase();
+  return '<span class="gym-logo" aria-hidden="true">' + xEsc(L) + (g.dom ? '<img alt="" loading="lazy" referrerpolicy="no-referrer" src="https://www.google.com/s2/favicons?domain=' + encodeURIComponent(g.dom) + '&sz=128">' : "") + '</span>';
 }
 function gymFind(){
   if (GYM.busy) return;
@@ -4354,7 +4375,7 @@ function renderGym(){
   else if (GYM.list){
     h += '<ul class="gym-list">' + GYM.list.map(function(g){
       var dest = g.lat + "," + g.lon;
-      return '<li class="gym-it"><b>' + e(g.n || t("gymNoName")) + '</b><span class="gym-d"><bdi>' + gymKm(g.d) + '</bdi></span>' +
+      return '<li class="gym-it"><span class="gym-hd">' + gymLogo(g) + '<b>' + e(g.n || t("gymNoName")) + '</b></span><span class="gym-d"><bdi>' + gymKm(g.d) + '</bdi></span>' +
         (g.adr ? '<small>' + e(g.adr) + '</small>' : "") +
         (g.h ? '<small>' + t("gymHours") + ': <bdi dir="ltr">' + e(g.h) + '</bdi></small>' : "") +
         '<span class="gym-acts"><a class="go" href="https://www.google.com/maps/dir/?api=1&destination=' + dest + '&travelmode=driving" target="_blank" rel="noopener">' + t("gymGo") + '</a>' +
@@ -4367,6 +4388,11 @@ function renderGym(){
     '<a href="' + gymMapsAll() + '" target="_blank" rel="noopener">' + t("gymAll") + '</a>' +
     '<small>' + t("gymNote") + '</small></div>';
   c.innerHTML = h;
+  /* لو الشعار ما انجاب أو صغير (أيقونة افتراضية) نخلي الحرف */
+  c.querySelectorAll(".gym-logo img").forEach(function(im){
+    var chk = function(){ if (im.naturalWidth < 32) im.remove(); else im.parentNode.classList.add("has-img"); };
+    if (im.complete && im.naturalWidth) chk(); else { im.addEventListener("load", chk); im.addEventListener("error", function(){ im.remove(); }); }
+  });
   var b = document.getElementById("gymGo"); if (b){ b.disabled = GYM.busy; b.addEventListener("click", gymFind); }
 }
 function gymToggle(on){

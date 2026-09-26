@@ -130,6 +130,22 @@ h1,h2,h3{font-family:"Readex Pro","IBM Plex Sans Arabic",system-ui,sans-serif;fo
 .st-foot{display:flex;justify-content:flex-end;padding-top:8px;border-top:1px solid var(--line-soft,var(--line))}
 .st-edit{font:inherit;font-size:13px;font-weight:700;color:#fff;background:var(--grad);border:0;border-radius:999px;padding:7px 16px;cursor:pointer}
 @media(max-width:420px){.st-row{grid-template-columns:1fr}.st-row dd{text-align:start}}
+.st-btns{display:flex;flex-wrap:wrap;gap:8px}
+.gym-card h3{display:flex;align-items:center;gap:8px}
+.gym-card h3 small{font-size:12px;font-weight:500;color:var(--muted)}
+.gym-msg{margin:0 0 10px;font-size:13.5px;color:var(--ink)}
+.gym-list{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:8px;max-height:420px;overflow-y:auto}
+.gym-it{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;padding:10px 12px;border-radius:12px;
+  background:color-mix(in srgb,#8B5CF6 7%,transparent);border:1px solid var(--line-soft,var(--line))}
+.gym-it b{font-size:14px;line-height:1.35}
+.gym-it .gym-d{font-size:12.5px;font-weight:700;color:var(--accent-deep);white-space:nowrap}
+.gym-it small{grid-column:1/-1;font-size:12px;color:var(--muted);line-height:1.5}
+.gym-it .gym-acts{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.gym-acts a{font-size:12.5px;font-weight:700;text-decoration:none;border-radius:999px;padding:5px 12px;border:1px solid var(--line);color:var(--ink);background:var(--surface)}
+.gym-acts a.go{color:#fff;background:var(--grad);border-color:transparent}
+.gym-foot{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--line-soft,var(--line))}
+.gym-foot a{font-size:13px;font-weight:700;color:var(--accent-deep)}
+.gym-foot small{font-size:11px;color:var(--muted);width:100%}
 .facts{display:flex;gap:8px;flex-wrap:wrap}
 .fact{background:var(--surface);border:1px solid var(--line-soft);border-radius:10px;padding:8px 11px;min-width:86px}
 .fact span{display:block;font-size:10.5px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
@@ -1195,12 +1211,20 @@ figure{margin:0}
   <section class="hero">
     <div>
       <div class="st">
+        <div class="st-btns">
         <button type="button" id="stBtn" class="st-btn" aria-expanded="false" aria-controls="stCard">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
           <span data-i18n="stBtn">حالتك الشخصية</span>
           <svg class="st-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
         </button>
+        <button type="button" id="gymBtn" class="st-btn" aria-expanded="false" aria-controls="gymCard">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+          <span data-i18n="gymBtn">نوادي قريبة</span>
+          <svg class="st-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        </div>
         <div id="stCard" class="st-card" hidden></div>
+        <div id="gymCard" class="st-card gym-card" aria-live="polite" hidden></div>
       </div>
     </div>
     <div class="facts">
@@ -2418,6 +2442,43 @@ Object.assign(window.I18N.en, {
   gemOffline:"No internet connection. The assistant needs internet.", gemRegion:"Google doesn't allow Gemini from your current location.",
   aiNoteGem:"The assistant uses Google's Gemini. Not a substitute for a doctor or physiotherapist.",
   photoSubKey:"Turn on the assistant first (free)", rpNAKey:"Turn on the assistant to get your weekly report.", gemSetupBtn:"Turn on the assistant"
+});
+/* نوادي قريبة */
+Object.assign(window.I18N.ar, {
+  gymBtn:"نوادي قريبة", gymTitle:"أقرب نوادي الجيم", gymWithin:"خلال {n} كم",
+  gymIntro:"أدوّر لك على نوادي الجيم القريبة من موقعك.", gymFind:"دوّر على نوادي", gymAgain:"دوّر مرة ثانية",
+  gymLocating:"أحدد موقعك…", gymSearching:"أدوّر على نوادي حولك…",
+  gymNone:"ما لقيت نوادي مسجلة قريب منك. شوف قوقل ماب تحت.", gymNoName:"نادي رياضي",
+  gymErrDenied:"ما سمحت للتطبيق يعرف موقعك. فعّل الموقع للتطبيق من إعدادات الجوال أو المتصفح وجرّب مرة ثانية.",
+  gymErrGeo:"ما قدرت أحدد موقعك. تأكد إن الـ GPS شغال وجرّب مرة ثانية، أو افتح قوقل ماب تحت.",
+  gymErrNet:"ما قدرت أجيب قائمة النوادي. تأكد من النت، أو افتح قوقل ماب تحت.",
+  gymGo:"ودّني", gymMap:"على الخريطة", gymWeb:"الموقع", gymHours:"الدوام",
+  gymAll:"شوف كل النوادي في قوقل ماب", gymM:"م", gymKm:"كم",
+  gymNote:"موقعك يُستخدم للبحث بس وما ينحفظ. القائمة من OpenStreetMap وممكن ينقصها نوادي."
+});
+Object.assign(window.I18N.nl, {
+  gymBtn:"Sportscholen dichtbij", gymTitle:"Dichtstbijzijnde sportscholen", gymWithin:"binnen {n} km",
+  gymIntro:"Ik zoek sportscholen dicht bij je locatie.", gymFind:"Zoek sportscholen", gymAgain:"Opnieuw zoeken",
+  gymLocating:"Locatie bepalen…", gymSearching:"Sportscholen zoeken…",
+  gymNone:"Geen sportscholen gevonden in de buurt. Bekijk Google Maps hieronder.", gymNoName:"Sportschool",
+  gymErrDenied:"Je hebt geen toegang tot je locatie gegeven. Zet locatie aan voor de app in je telefoon- of browserinstellingen en probeer opnieuw.",
+  gymErrGeo:"Je locatie kon niet worden bepaald. Controleer of GPS aan staat, of open Google Maps hieronder.",
+  gymErrNet:"De lijst kon niet worden geladen. Controleer je internet, of open Google Maps hieronder.",
+  gymGo:"Route", gymMap:"Op kaart", gymWeb:"Website", gymHours:"Open",
+  gymAll:"Alle sportscholen in Google Maps", gymM:"m", gymKm:"km",
+  gymNote:"Je locatie wordt alleen gebruikt om te zoeken en niet opgeslagen. De lijst komt van OpenStreetMap en kan onvolledig zijn."
+});
+Object.assign(window.I18N.en, {
+  gymBtn:"Gyms nearby", gymTitle:"Nearest gyms", gymWithin:"within {n} km",
+  gymIntro:"I'll look for gyms close to your location.", gymFind:"Find gyms", gymAgain:"Search again",
+  gymLocating:"Finding your location…", gymSearching:"Looking for gyms around you…",
+  gymNone:"No gyms listed near you. Check Google Maps below.", gymNoName:"Gym",
+  gymErrDenied:"Location access was denied. Allow location for the app in your phone or browser settings and try again.",
+  gymErrGeo:"Couldn't get your location. Make sure GPS is on and try again, or open Google Maps below.",
+  gymErrNet:"Couldn't load the gym list. Check your internet, or open Google Maps below.",
+  gymGo:"Directions", gymMap:"On map", gymWeb:"Website", gymHours:"Hours",
+  gymAll:"See all gyms in Google Maps", gymM:"m", gymKm:"km",
+  gymNote:"Your location is only used for the search and isn't saved. The list comes from OpenStreetMap and may miss some gyms."
 });
 </script>
 <script>
@@ -4168,7 +4229,7 @@ function renderProfileTexts(){
   var note = profNote();
   var extra = note ? note
     : tf("heroLv_" + lvK) + (injL.length ? sep() + fill(t("heroInj"), { x:injL.join(t("heroAnd")) }) : "");
-  renderStatus();
+  renderStatus(); if (typeof renderGym === "function" && !document.getElementById("gymCard").hidden) renderGym();
   document.getElementById("brandSub").textContent = fill(t("brandSubT"), { n:n }) + (n < 5 ? t("brandSubOpt") : "");
   document.getElementById("fDaysV").textContent = n < 5 ? n + "+1" : String(n);
   var legacy = typeof P.note === "object" && P.note;      // ملف أشرف الأصلي (نصوص الركبة الخاصة فيه)
@@ -4224,7 +4285,101 @@ function stToggle(on){
   var b = document.getElementById("stBtn"), c = document.getElementById("stCard");
   if (on == null) on = c.hidden;
   c.hidden = !on; b.setAttribute("aria-expanded", String(on));
+  if (on && typeof gymToggle === "function") gymToggle(false);
 }
+
+/* ---------- نوادي قريبة: موقعك + OpenStreetMap + قوقل ماب ---------- */
+var GYM = { busy:false, list:null, pos:null, err:"", r:0 };
+function gymDist(a, b, c, d){
+  var R = 6371, r = Math.PI / 180, x = Math.sin((c - a) * r / 2), y = Math.sin((d - b) * r / 2);
+  return 2 * R * Math.asin(Math.sqrt(x * x + Math.cos(a * r) * Math.cos(c * r) * y * y));
+}
+function gymMapsAll(){
+  return GYM.pos ? "https://www.google.com/maps/search/gym/@" + GYM.pos.lat + "," + GYM.pos.lon + ",14z" : "https://www.google.com/maps/search/gym+near+me";
+}
+async function gymQuery(lat, lon, rad){
+  var q = '[out:json][timeout:20];(' +
+    'nwr["leisure"="fitness_centre"](around:' + rad + ',' + lat + ',' + lon + ');' +
+    'nwr["amenity"="gym"](around:' + rad + ',' + lat + ',' + lon + ');' +
+    'nwr["leisure"="sports_centre"]["sport"~"fitness|weightlifting|crossfit|bodybuilding"](around:' + rad + ',' + lat + ',' + lon + ');' +
+    ');out center tags;';
+  var hosts = ["https://overpass-api.de/api/interpreter", "https://overpass.private.coffee/api/interpreter"], last;
+  for (var i = 0; i < hosts.length; i++){
+    try {
+      var r = await fetch(hosts[i], { method:"POST", headers:{ "content-type":"application/x-www-form-urlencoded" }, body:"data=" + encodeURIComponent(q) });
+      if (r.ok) return (await r.json()).elements || [];
+      last = new Error("http " + r.status);
+    } catch (e) { last = e; }
+  }
+  throw last || new Error("net");
+}
+function gymParse(els, lat, lon){
+  var seen = {}, out = [];
+  els.forEach(function(el){
+    var g = el.tags || {}, la = el.lat != null ? el.lat : el.center && el.center.lat, lo = el.lon != null ? el.lon : el.center && el.center.lon;
+    if (la == null || lo == null) return;
+    var name = g.name || g.brand || "";
+    var key = (name || "?").toLowerCase() + "|" + la.toFixed(3) + "|" + lo.toFixed(3);
+    if (seen[key]) return; seen[key] = 1;
+    var adr = [[g["addr:street"], g["addr:housenumber"]].filter(Boolean).join(" "), g["addr:city"]].filter(Boolean).join(", ");
+    out.push({ n:name, lat:la, lon:lo, d:gymDist(lat, lon, la, lo), adr:adr, h:g.opening_hours || "", web:g.website || g["contact:website"] || "" });
+  });
+  return out.sort(function(a, b){ return a.d - b.d; }).slice(0, 12);
+}
+function gymFind(){
+  if (GYM.busy) return;
+  GYM.busy = true; GYM.err = ""; GYM.list = null; renderGym();
+  if (!navigator.geolocation){ GYM.busy = false; GYM.err = "gymErrGeo"; renderGym(); return; }
+  navigator.geolocation.getCurrentPosition(async function(p){
+    /* نقرّب الموقع لحوالي 100 متر عشان الخصوصية */
+    var lat = +p.coords.latitude.toFixed(3), lon = +p.coords.longitude.toFixed(3);
+    GYM.pos = { lat:lat, lon:lon }; renderGym();
+    try {
+      var list = gymParse(await gymQuery(lat, lon, 5000), lat, lon), rad = 5;
+      if (list.length < 3){ list = gymParse(await gymQuery(lat, lon, 15000), lat, lon); rad = 15; }
+      GYM.list = list; GYM.r = rad;
+    } catch (e) { GYM.err = "gymErrNet"; }
+    GYM.busy = false; renderGym();
+  }, function(e){
+    GYM.busy = false; GYM.err = e && e.code === 1 ? "gymErrDenied" : "gymErrGeo"; renderGym();
+  }, { enableHighAccuracy:false, timeout:15000, maximumAge:300000 });
+}
+function gymKm(d){ return d < 1 ? Math.round(d * 1000 / 10) * 10 + " " + t("gymM") : (Math.round(d * 10) / 10).toLocaleString(locale()) + " " + t("gymKm"); }
+function renderGym(){
+  var c = document.getElementById("gymCard"); if (!c) return;
+  var e = xEsc, h = '<h3>' + t("gymTitle") + (GYM.list && GYM.list.length ? ' <small>' + fill(t("gymWithin"), { n:GYM.r }) + '</small>' : "") + '</h3>';
+  if (GYM.busy) h += '<p class="gym-msg"><span class="ai-dots"><i></i><i></i><i></i><span>' + t(GYM.pos ? "gymSearching" : "gymLocating") + '</span></span></p>';
+  else if (GYM.err) h += '<p class="gym-msg">' + t(GYM.err) + '</p>';
+  else if (GYM.list && !GYM.list.length) h += '<p class="gym-msg">' + t("gymNone") + '</p>';
+  else if (GYM.list){
+    h += '<ul class="gym-list">' + GYM.list.map(function(g){
+      var dest = g.lat + "," + g.lon;
+      return '<li class="gym-it"><b>' + e(g.n || t("gymNoName")) + '</b><span class="gym-d"><bdi>' + gymKm(g.d) + '</bdi></span>' +
+        (g.adr ? '<small>' + e(g.adr) + '</small>' : "") +
+        (g.h ? '<small>' + t("gymHours") + ': <bdi dir="ltr">' + e(g.h) + '</bdi></small>' : "") +
+        '<span class="gym-acts"><a class="go" href="https://www.google.com/maps/dir/?api=1&destination=' + dest + '&travelmode=driving" target="_blank" rel="noopener">' + t("gymGo") + '</a>' +
+        '<a href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((g.n ? g.n + " " : "") + dest) + '" target="_blank" rel="noopener">' + t("gymMap") + '</a>' +
+        (g.web && /^https?:\/\//i.test(g.web) ? '<a href="' + e(g.web) + '" target="_blank" rel="noopener">' + t("gymWeb") + '</a>' : "") + '</span></li>';
+    }).join("") + '</ul>';
+  }
+  else h += '<p class="gym-msg">' + t("gymIntro") + '</p>';
+  h += '<div class="gym-foot"><button type="button" class="st-edit" id="gymGo">' + t(GYM.list || GYM.err ? "gymAgain" : "gymFind") + '</button>' +
+    '<a href="' + gymMapsAll() + '" target="_blank" rel="noopener">' + t("gymAll") + '</a>' +
+    '<small>' + t("gymNote") + '</small></div>';
+  c.innerHTML = h;
+  var b = document.getElementById("gymGo"); if (b){ b.disabled = GYM.busy; b.addEventListener("click", gymFind); }
+}
+function gymToggle(on){
+  var b = document.getElementById("gymBtn"), c = document.getElementById("gymCard");
+  if (on == null) on = c.hidden;
+  c.hidden = !on; b.setAttribute("aria-expanded", String(on));
+  if (on){
+    stToggle(false); renderGym();
+    if (!GYM.list && !GYM.busy && !GYM.err) gymFind();
+  }
+}
+document.getElementById("gymBtn").addEventListener("click", function(){ gymToggle(); });
+document.addEventListener("keydown", function(ev){ if (ev.key === "Escape" && !document.getElementById("gymCard").hidden) gymToggle(false); });
 document.getElementById("stBtn").addEventListener("click", function(){ stToggle(); });
 document.addEventListener("keydown", function(ev){ if (ev.key === "Escape" && !document.getElementById("stCard").hidden) stToggle(false); });
 

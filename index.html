@@ -4345,7 +4345,7 @@ function gymDomain(web, name){
 }
 function gymLogo(g){
   var L = (String(g.n || t("gymNoName")).replace(/[^\p{L}\p{N}]/gu, "").charAt(0) || "G").toUpperCase();
-  return '<span class="gym-logo" aria-hidden="true">' + xEsc(L) + (g.dom ? '<img alt="" loading="lazy" referrerpolicy="no-referrer" src="https://www.google.com/s2/favicons?domain=' + encodeURIComponent(g.dom) + '&sz=128">' : "") + '</span>';
+  return '<span class="gym-logo" aria-hidden="true">' + xEsc(L) + (g.dom ? '<img alt="" referrerpolicy="no-referrer" src="https://www.google.com/s2/favicons?domain=' + encodeURIComponent(g.dom) + '&sz=128">' : "") + '</span>';
 }
 function gymFind(){
   if (GYM.busy) return;

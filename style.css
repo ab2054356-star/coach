@@ -1174,3 +1174,17 @@ html:has(#root.sess-open),html:has(#root.sess-open) body{overflow:hidden;overscr
   .ss-kg input{font-size:22px}
   .ss-done{padding:11px 16px;font-size:15px}
 }
+
+/* خلفية الشاشة = شعار التطبيق: تدرّج البنفسجي مع الدمبل الأبيض.
+   طبقة خفيفة بلون الخلفية فوقه عشان الكلام يبقى واضح — غيّر --logo-veil لو تبغاه أقوى أو أخف */
+:root{--logo-veil:62%}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){--logo-veil:55%} }
+:root[data-theme="dark"]{--logo-veil:55%}
+html body{background:transparent}
+body::before{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    linear-gradient(color-mix(in srgb,var(--bg) var(--logo-veil),transparent),color-mix(in srgb,var(--bg) var(--logo-veil),transparent)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='%23fff'%3E%3Crect x='70' y='183' width='36' height='146' rx='12'/%3E%3Crect x='113' y='152' width='46' height='208' rx='14'/%3E%3Crect x='150' y='238' width='212' height='36' rx='8'/%3E%3Crect x='353' y='152' width='46' height='208' rx='14'/%3E%3Crect x='406' y='183' width='36' height='146' rx='12'/%3E%3C/svg%3E") center / min(92vw,760px) auto no-repeat,
+    var(--grad);
+}

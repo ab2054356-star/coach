@@ -482,10 +482,66 @@
 <!-- كود التطبيق كله هنا -->
 <script src="app.js"></script>
 <script>
-/* تطبيق (PWA): يشتغل بدون نت بعد أول فتح */
-if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1")) {
-  window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); });
-}
+/* ==================================================================
+   تطبيق (PWA) + تحديث تلقائي
+   - يشتغل بدون نت بعد أول فتح (sw.js)
+   - كل ما ترجع للتطبيق يشيّك لو فيه نسخة جديدة على GitHub (يقارن بصمة الملفات)
+   - لو فيه جديد: يحدّث على طول، ولو أنت في نص تمرين/مؤقت/كتابة يطلع زر «حدّث الآن»
+   ================================================================== */
+(function(){
+  if (!("serviceWorker" in navigator)) return;
+  if (!(location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1")) return;
+  var FILES = ["index.html", "app.js", "style.css", "i18n.js", "sw.js"];
+  var FLAG = "coach-just-updated", base = null, last = 0, reloading = false;
+  function tt(k, fb){ try { var v = typeof t === "function" ? t(k) : ""; return v && v !== k ? v : fb; } catch (e) { return fb; } }
+  function stamp(){
+    return Promise.all(FILES.map(function(f){
+      return fetch(f, { method:"HEAD", cache:"no-store" })
+        .then(function(r){ return r.ok ? f + "=" + (r.headers.get("etag") || r.headers.get("last-modified") || "") : null; })
+        .catch(function(){ return null; });
+    })).then(function(a){ return a.indexOf(null) >= 0 ? null : a.join("|"); });
+  }
+  function busy(){
+    var on = function(id){ var e = document.getElementById(id); return !!(e && !e.hidden); };
+    var a = document.activeElement;
+    return on("sess") || on("timer") || on("aiPanel") || on("player") || !!(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName));
+  }
+  function apply(){
+    if (reloading) return; reloading = true;
+    try { sessionStorage.setItem(FLAG, "1"); } catch (e) {}
+    location.reload();
+  }
+  function toast(msg, btn){
+    var old = document.getElementById("updBar"); if (old) old.remove();
+    var d = document.createElement("div");
+    d.id = "updBar"; d.className = "upd-bar"; d.setAttribute("role", "status");
+    d.innerHTML = "<span></span>" + (btn ? '<button type="button"></button>' : "");
+    d.querySelector("span").textContent = msg;
+    if (btn){ var b = d.querySelector("button"); b.textContent = btn; b.addEventListener("click", apply); }
+    document.body.appendChild(d);
+    if (!btn) setTimeout(function(){ d.remove(); }, 3500);
+  }
+  function check(force){
+    if (reloading || navigator.onLine === false) return;
+    var now = Date.now(); if (!force && now - last < 30000) return; last = now;
+    navigator.serviceWorker.getRegistration().then(function(r){ if (r) r.update().catch(function(){}); });
+    stamp().then(function(s){
+      if (!s) return;                                   // النت مقطوع أو خطأ — نجرب بعدين
+      if (base === null){ base = s; return; }
+      if (s !== base){ if (busy()) toast(tt("updAvail", "فيه تحديث جديد للتطبيق"), tt("updNow", "حدّث الآن")); else apply(); }
+    });
+  }
+  window.coachCheckUpdate = check;                      // للتجربة من الـ Console
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("sw.js", { updateViaCache:"none" }).catch(function(){});
+    check(true);
+    var j = null; try { j = sessionStorage.getItem(FLAG); sessionStorage.removeItem(FLAG); } catch (e) {}
+    if (j) toast(tt("updDone", "تم تحديث التطبيق ✓"));
+  });
+  document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "visible") check(false); });
+  window.addEventListener("online", function(){ check(true); });
+  setInterval(function(){ if (document.visibilityState === "visible") check(false); }, 5 * 60000);
+})();
 </script>
 </body>
 </html>

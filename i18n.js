@@ -935,3 +935,19 @@ Object.assign(window.I18N.en, {
   wsWarmFin:"Warm-up complete", wsWarmFinSub:"Your body is ready. Start your session now.",
   wsCoolFin:"Cool-down complete", wsCoolFinSub:"Session wrapped up properly. Rest and drink some water.", wsSum:"{d} of {n} steps"
 });
+
+/* التحديث التلقائي */
+(function(){
+  var K = {
+    ar:{ updAvail:"فيه تحديث جديد للتطبيق", updNow:"حدّث الآن", updDone:"تم تحديث التطبيق ✓" },
+    nl:{ updAvail:"Er is een nieuwe versie", updNow:"Nu bijwerken", updDone:"App bijgewerkt ✓" },
+    en:{ updAvail:"A new version is available", updNow:"Update now", updDone:"App updated ✓" },
+    tr:{ updAvail:"Yeni bir sürüm var", updNow:"Şimdi güncelle", updDone:"Uygulama güncellendi ✓" },
+    de:{ updAvail:"Neue Version verfügbar", updNow:"Jetzt aktualisieren", updDone:"App aktualisiert ✓" },
+    fr:{ updAvail:"Nouvelle version disponible", updNow:"Mettre à jour", updDone:"Application mise à jour ✓" },
+    es:{ updAvail:"Hay una nueva versión", updNow:"Actualizar ahora", updDone:"App actualizada ✓" },
+    pt:{ updAvail:"Nova versão disponível", updNow:"Atualizar agora", updDone:"App atualizado ✓" },
+    zh:{ updAvail:"有新版本可用", updNow:"立即更新", updDone:"应用已更新 ✓" }
+  };
+  Object.keys(K).forEach(function(l){ if (window.I18N[l]) Object.assign(window.I18N[l], K[l]); });
+})();

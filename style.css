@@ -1188,3 +1188,10 @@ body::before{
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='%23fff'%3E%3Crect x='70' y='183' width='36' height='146' rx='12'/%3E%3Crect x='113' y='152' width='46' height='208' rx='14'/%3E%3Crect x='150' y='238' width='212' height='36' rx='8'/%3E%3Crect x='353' y='152' width='46' height='208' rx='14'/%3E%3Crect x='406' y='183' width='36' height='146' rx='12'/%3E%3C/svg%3E") center / min(92vw,760px) auto no-repeat,
     var(--grad);
 }
+
+/* شريط «فيه تحديث جديد» / «تم التحديث» */
+.upd-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:200;
+  display:flex;align-items:center;gap:10px;max-width:calc(100vw - 32px);padding:10px 12px 10px 16px;border-radius:999px;
+  background:var(--grad);color:#fff;font-size:14px;font-weight:600;box-shadow:0 14px 34px -12px rgba(76,29,149,.8);animation:updIn .25s ease}
+.upd-bar button{font:inherit;font-size:13px;font-weight:700;border:0;border-radius:999px;padding:6px 14px;background:#fff;color:#5B21B6;cursor:pointer}
+@keyframes updIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}

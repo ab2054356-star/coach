@@ -2,6 +2,9 @@
 
 /* ---------------- storage ---------------- */
 var KEY = "gymComeback.v1";
+/* الشارة اللي جنب صورة الملف الشخصي فوق — تطلع لكل اللي عندهم التطبيق.
+   غيّرها هنا، أو خلها "" عشان تختفي */
+var APP_BADGE = "A ❤️ A";
 var state = { phase: 1, day: "A", sets: {}, kg: {}, checks: {}, weights: [], today: null };
 try {
   var raw = localStorage.getItem(KEY);
@@ -1744,6 +1747,8 @@ function renderProfileTexts(){
   var kt = document.querySelector('[data-i18n="kneeText"]');
   if (kt && !legacy) kt.textContent = t("kneeTextGen");
   document.getElementById("profBtnT").textContent = P.name ? P.name : t("pfBtn");
+  var bdg = document.getElementById("profBadge");                       // الشارة اللي جنب صورة الملف — تطلع للكل
+  if (bdg){ bdg.textContent = APP_BADGE; bdg.hidden = !APP_BADGE; }
   document.getElementById("profBtn").title = t("pfBtn");
   document.getElementById("injKnee").hidden = !inj.knee;
 

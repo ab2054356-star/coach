@@ -1201,3 +1201,8 @@ body::before{
 .tabs,.rail,.lib-chips,.ai-chips,.scroll-x{overflow-y:hidden;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
 .tabs{border-bottom:0;box-shadow:inset 0 -1px 0 var(--line)}
 .tabs button{margin-bottom:0}
+
+/* الشارة جنب صورة الملف الشخصي (APP_BADGE في app.js) — تطلع للكل وحتى في الجوال */
+.prof-btn .prof-badge{font-weight:700;white-space:nowrap;padding-inline-start:7px;border-inline-start:1px solid var(--line)}
+.prof-btn .prof-badge[hidden]{display:none}
+@media(max-width:560px){ .prof-btn .prof-badge:not([hidden]){display:inline;padding-inline-start:0;border:0} }

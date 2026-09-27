@@ -951,3 +951,10 @@ Object.assign(window.I18N.en, {
   };
   Object.keys(K).forEach(function(l){ if (window.I18N[l]) Object.assign(window.I18N[l], K[l]); });
 })();
+
+/* شارة جنب صورة الملف الشخصي */
+(function(){
+  var K = { ar:"شارة جنب صورتك", nl:"Badge naast je foto", en:"Badge next to your photo", tr:"Fotoğrafının yanındaki rozet", de:"Abzeichen neben deinem Foto",
+    fr:"Badge à côté de ta photo", es:"Insignia junto a tu foto", pt:"Selo ao lado da sua foto", zh:"头像旁的标记" };
+  Object.keys(K).forEach(function(l){ if (window.I18N[l]) window.I18N[l].pfBadge = K[l]; });
+})();

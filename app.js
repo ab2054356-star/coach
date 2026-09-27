@@ -2382,6 +2382,24 @@ function renderStepSess(){
   document.getElementById("ssPrev").addEventListener("click", function(){ if (SS.i > 0){ SS.i--; renderSess(); } });
   document.getElementById("ssNext").addEventListener("click", function(){ SS.i++; renderSess(); });
 }
+/* السحب يمين/يسار في وضع التمرين والإحماء = التالي/السابق */
+(function(){
+  var x0 = null, y0 = 0;
+  sessEl.addEventListener("touchstart", function(ev){
+    if (ev.touches.length !== 1 || /INPUT|TEXTAREA/.test(ev.target.tagName)){ x0 = null; return; }
+    x0 = ev.touches[0].clientX; y0 = ev.touches[0].clientY;
+  }, { passive:true });
+  sessEl.addEventListener("touchend", function(ev){
+    if (x0 == null) return;
+    var dx = ev.changedTouches[0].clientX - x0, dy = ev.changedTouches[0].clientY - y0;
+    x0 = null;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    var rtl = getComputedStyle(sessEl).direction === "rtl";
+    var fwd = rtl ? dx > 0 : dx < 0;
+    var b = document.getElementById(fwd ? "ssNext" : "ssPrev") || (!fwd && document.getElementById("ssBackEx"));
+    if (b && !b.disabled) b.click();
+  }, { passive:true });
+})();
 [["warmGo", "warm"], ["coolGo", "cool"]].forEach(function(g){
   var b = document.getElementById(g[0]);
   if (b) b.addEventListener("click", function(){ stepsOpen(g[1]); });

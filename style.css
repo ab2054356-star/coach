@@ -1157,3 +1157,20 @@ figure{margin:0}
 .add-card{max-width:460px}
 .pf-f select{font:inherit;font-size:14.5px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:9px 12px;width:100%}
 @media(max-width:560px){ .lgrid{grid-template-columns:repeat(2,minmax(0,1fr))} .lmeta b{font-size:12.5px} }
+
+/* وضع التمرين في الجوال: الشاشة ثابتة، والصفحة اللي وراها ما تتحرك */
+html:has(#root.sess-open),html:has(#root.sess-open) body{overflow:hidden;overscroll-behavior:none}
+.sess{overscroll-behavior:contain}
+@media(max-width:560px){
+  .sess-in{padding:10px 12px 110px;gap:8px}
+  .sess-body{padding:10px;gap:8px;border-radius:18px}
+  .ss-media .reel{height:120px}
+  .ss-media .map .bodyimg,.ss-media .map .bstack{height:110px}
+  .ss-name h2{font-size:18px}
+  .ss-target b{font-size:17px}
+  .sess-body .cue{font-size:13px;margin:0}
+  .ss-dot{width:38px;height:38px;font-size:15px}
+  .ss-step{width:42px;height:42px}
+  .ss-kg input{font-size:22px}
+  .ss-done{padding:11px 16px;font-size:15px}
+}

@@ -994,3 +994,45 @@ Object.assign(window.I18N.en, {
   };
   Object.keys(K).forEach(function(l){ if (window.I18N[l]) Object.assign(window.I18N[l], K[l]); });
 })();
+/* تركيب الجسم: المؤشر المتفاعل (الهدف) */
+(function(){
+  var K = {
+    ar:{ bcDrag:"اسحب الدائرة الملوّنة على أي شريط وشوف وش يصير لوزنك.", bcFatBar:"نسبة الدهون", bcAth:"رياضي", bcFit:"لياقة", bcAvg:"مقبول", bcHigh:"عالي",
+      bcYou:"أنت الحين", bcGoal:"هدفك", bcTgtW:"الوزن المتوقع", bcLose:"تنزل {n} كجم دهون", bcGain:"تزيد {n} كجم", bcKeep:"أنت عند هالهدف",
+      bcTime:"تقريباً {a}–{b} {u} (نص كيلو لكيلو بالأسبوع)", bcWk:"أسبوع", bcMo:"شهور", bcAssume:"الحساب بافتراض إنك تحافظ على عضلك وعظمك ({n} كجم).",
+      bcHealthyW:"الوزن الصحي لطولك: {a}–{b} كجم", bcTooLow:"هالوزن أقل من اللازم لجسمك — يعني بتخسر من عضلك." },
+    nl:{ bcDrag:"Sleep het gekleurde bolletje op een balk en zie wat er met je gewicht gebeurt.", bcFatBar:"Vetpercentage", bcAth:"Atleet", bcFit:"Fit", bcAvg:"Gemiddeld", bcHigh:"Hoog",
+      bcYou:"Nu", bcGoal:"Je doel", bcTgtW:"Verwacht gewicht", bcLose:"{n} kg vet kwijt", bcGain:"{n} kg erbij", bcKeep:"Je zit op dit doel",
+      bcTime:"Ongeveer {a}–{b} {u} (½–1 kg per week)", bcWk:"weken", bcMo:"maanden", bcAssume:"Uitgaande van behoud van spieren en botten ({n} kg).",
+      bcHealthyW:"Gezond gewicht voor jouw lengte: {a}–{b} kg", bcTooLow:"Dit gewicht is te laag voor je lichaam — je zou spiermassa verliezen." },
+    en:{ bcDrag:"Drag the coloured dot on either bar to see what happens to your weight.", bcFatBar:"Body fat", bcAth:"Athlete", bcFit:"Fit", bcAvg:"Average", bcHigh:"High",
+      bcYou:"You now", bcGoal:"Your goal", bcTgtW:"Expected weight", bcLose:"Lose {n} kg of fat", bcGain:"Gain {n} kg", bcKeep:"You're at this goal",
+      bcTime:"About {a}–{b} {u} (½–1 kg a week)", bcWk:"weeks", bcMo:"months", bcAssume:"Assumes you keep your muscle and bone ({n} kg).",
+      bcHealthyW:"Healthy weight for your height: {a}–{b} kg", bcTooLow:"This weight is too low for your body — you'd lose muscle." },
+    tr:{ bcDrag:"Renkli noktayı çubuklardan birinde kaydır, kilona ne olacağını gör.", bcFatBar:"Yağ oranı", bcAth:"Atlet", bcFit:"Fit", bcAvg:"Orta", bcHigh:"Yüksek",
+      bcYou:"Şu an", bcGoal:"Hedefin", bcTgtW:"Beklenen kilo", bcLose:"{n} kg yağ ver", bcGain:"{n} kg al", bcKeep:"Bu hedeftesin",
+      bcTime:"Yaklaşık {a}–{b} {u} (haftada ½–1 kg)", bcWk:"hafta", bcMo:"ay", bcAssume:"Kas ve kemiğini koruduğun varsayılır ({n} kg).",
+      bcHealthyW:"Boyuna göre sağlıklı kilo: {a}–{b} kg", bcTooLow:"Bu kilo vücudun için çok düşük — kas kaybedersin." },
+    de:{ bcDrag:"Zieh den farbigen Punkt auf einem Balken und sieh, was mit deinem Gewicht passiert.", bcFatBar:"Körperfett", bcAth:"Athlet", bcFit:"Fit", bcAvg:"Mittel", bcHigh:"Hoch",
+      bcYou:"Jetzt", bcGoal:"Dein Ziel", bcTgtW:"Erwartetes Gewicht", bcLose:"{n} kg Fett weniger", bcGain:"{n} kg mehr", bcKeep:"Du bist bei diesem Ziel",
+      bcTime:"Etwa {a}–{b} {u} (½–1 kg pro Woche)", bcWk:"Wochen", bcMo:"Monate", bcAssume:"Annahme: Muskeln und Knochen bleiben gleich ({n} kg).",
+      bcHealthyW:"Gesundes Gewicht für deine Größe: {a}–{b} kg", bcTooLow:"Dieses Gewicht ist zu niedrig für deinen Körper — du würdest Muskeln verlieren." },
+    fr:{ bcDrag:"Fais glisser le point coloré sur une barre pour voir l'effet sur ton poids.", bcFatBar:"Masse grasse", bcAth:"Athlète", bcFit:"Forme", bcAvg:"Moyen", bcHigh:"Élevé",
+      bcYou:"Maintenant", bcGoal:"Ton objectif", bcTgtW:"Poids prévu", bcLose:"Perdre {n} kg de graisse", bcGain:"Prendre {n} kg", bcKeep:"Tu es à cet objectif",
+      bcTime:"Environ {a}–{b} {u} (½–1 kg par semaine)", bcWk:"semaines", bcMo:"mois", bcAssume:"En gardant tes muscles et tes os ({n} kg).",
+      bcHealthyW:"Poids sain pour ta taille : {a}–{b} kg", bcTooLow:"Ce poids est trop bas pour ton corps — tu perdrais du muscle." },
+    es:{ bcDrag:"Arrastra el punto de color en cualquier barra y mira qué pasa con tu peso.", bcFatBar:"Grasa corporal", bcAth:"Atleta", bcFit:"Fitness", bcAvg:"Promedio", bcHigh:"Alto",
+      bcYou:"Ahora", bcGoal:"Tu objetivo", bcTgtW:"Peso esperado", bcLose:"Perder {n} kg de grasa", bcGain:"Ganar {n} kg", bcKeep:"Estás en este objetivo",
+      bcTime:"Unas {a}–{b} {u} (½–1 kg por semana)", bcWk:"semanas", bcMo:"meses", bcAssume:"Suponiendo que mantienes músculo y hueso ({n} kg).",
+      bcHealthyW:"Peso saludable para tu altura: {a}–{b} kg", bcTooLow:"Este peso es demasiado bajo para tu cuerpo: perderías músculo." },
+    pt:{ bcDrag:"Arraste o ponto colorido em qualquer barra e veja o que acontece com seu peso.", bcFatBar:"Gordura corporal", bcAth:"Atleta", bcFit:"Fitness", bcAvg:"Médio", bcHigh:"Alto",
+      bcYou:"Agora", bcGoal:"Sua meta", bcTgtW:"Peso esperado", bcLose:"Perder {n} kg de gordura", bcGain:"Ganhar {n} kg", bcKeep:"Você está nessa meta",
+      bcTime:"Cerca de {a}–{b} {u} (½–1 kg por semana)", bcWk:"semanas", bcMo:"meses", bcAssume:"Supondo que você mantenha músculo e osso ({n} kg).",
+      bcHealthyW:"Peso saudável para sua altura: {a}–{b} kg", bcTooLow:"Esse peso é baixo demais para seu corpo — você perderia músculo." },
+    zh:{ bcDrag:"在任一条上拖动彩色圆点，看看体重会怎样变化。", bcFatBar:"体脂率", bcAth:"运动员", bcFit:"健身", bcAvg:"一般", bcHigh:"偏高",
+      bcYou:"现在", bcGoal:"你的目标", bcTgtW:"预计体重", bcLose:"减掉 {n} 公斤脂肪", bcGain:"增加 {n} 公斤", bcKeep:"你已达到这个目标",
+      bcTime:"大约 {a}–{b} {u}（每周 0.5–1 公斤）", bcWk:"周", bcMo:"个月", bcAssume:"假设你的肌肉和骨量保持不变（{n} 公斤）。",
+      bcHealthyW:"你身高对应的健康体重：{a}–{b} 公斤", bcTooLow:"这个体重对你来说太低，会流失肌肉。" }
+  };
+  Object.keys(K).forEach(function(l){ if (window.I18N[l]) Object.assign(window.I18N[l], K[l]); });
+})();

@@ -2659,6 +2659,106 @@ function bodyDonut(x){
   }).join("");
   return '<svg class="bc-donut" viewBox="0 0 120 120" aria-hidden="true"><g transform="rotate(-90 60 60)"><circle cx="60" cy="60" r="' + R + '" fill="none" stroke="var(--line)" stroke-width="14"/>' + arcs + '</g></svg>';
 }
+/* المؤشر المتفاعل: هدف واحد (وزن) يتحرّك على شريط الدهون وشريط BMI مع بعض.
+   الحساب: كتلتك بدون دهون (عضل + عظم + ماء) ثابتة ← الوزن = الكتلة بدون دهون ÷ (1 − نسبة الدهون) */
+var BC_FAT = { m:{ min:5, max:45, cuts:[14, 18, 25], def:20, ess:5 }, f:{ min:10, max:50, cuts:[21, 25, 32], def:28, ess:12 } };
+var BC_BMI = { min:15, max:40, cuts:[18.5, 25, 30] };
+function bcFill(k, o){ return t(k).replace(/\{(\w)\}/g, function(m, x){ return o[x] != null ? o[x] : m; }); }
+function bcModel(last){
+  var P = PROF(), h = +P.height, hm2 = h > 100 ? Math.pow(h / 100, 2) : 0;
+  var w = last.bmi && hm2 ? last.bmi * hm2 : (latestWeight() || +P.weight);
+  if (!(w > 30)) return null;
+  var F = BC_FAT[P.sex === "f" ? "f" : "m"], lean = last.fat != null && last.fat < 90 ? w * (1 - last.fat / 100) : null;
+  if (!lean && !hm2) return null;
+  var M = { w:w, lean:lean, hm2:hm2, F:F, fat:last.fat, bmi:last.bmi || (hm2 ? w / hm2 : null) };
+  M.fatAt = function(W){ return lean ? Math.max(0, (W - lean) / W * 100) : null; };
+  M.bmiAt = function(W){ return hm2 ? W / hm2 : null; };
+  M.range = function(kind){ return kind === "fat" ? F : BC_BMI; };
+  M.valAt = function(kind, W){ return kind === "fat" ? M.fatAt(W) : M.bmiAt(W); };
+  M.wFor = function(kind, v){ return kind === "fat" ? lean / (1 - v / 100) : v * hm2; };
+  var lo = [], hi = [];
+  if (hm2){ lo.push(BC_BMI.min * hm2); hi.push(BC_BMI.max * hm2); }
+  if (lean){ lo.push(M.wFor("fat", F.min)); hi.push(M.wFor("fat", F.max)); }
+  M.lo = Math.min.apply(null, lo); M.hi = Math.max.apply(null, hi);
+  var saved = +state.bcTarget;
+  M.W = saved >= M.lo && saved <= M.hi ? saved : lean ? M.wFor("fat", F.def) : 24.9 * hm2;
+  return M;
+}
+function bcPct(M, kind){
+  var R = M.range(kind), v = M.valAt(kind, M.W);
+  return Math.max(0, Math.min(100, (v - R.min) / (R.max - R.min) * 100));
+}
+function bcBarHTML(M, kind, labels, cls){
+  var R = M.range(kind), edges = [R.min].concat(R.cuts, [R.max]);
+  var fr = edges.slice(1).map(function(e, i){ return (e - edges[i]).toFixed(2) + "fr"; }).join(" ");
+  var cur = kind === "fat" ? M.fat : M.bmi, curPct = Math.max(2, Math.min(98, (cur - R.min) / (R.max - R.min) * 100));
+  var cat = cur < R.cuts[0] ? 0 : cur < R.cuts[1] ? 1 : cur < R.cuts[2] ? 2 : 3;
+  return '<div class="bc-track" data-bcbar="' + kind + '" role="slider" tabindex="0" aria-label="' + t("bcGoal") + ' · ' + t(kind === "fat" ? "bcFatBar" : "bcBmi") + '">' +
+    '<div class="bc-bar ' + cls + '" dir="ltr" style="grid-template-columns:' + fr + '">' +
+    '<span class="bc-seg s0"></span><span class="bc-seg s1"></span><span class="bc-seg s2"></span><span class="bc-seg s3"></span>' +
+    '<i class="bc-now" style="left:' + curPct.toFixed(1) + '%"></i><b class="bc-hd"><em></em></b></div></div>' +
+    '<div class="bc-cats" dir="ltr" style="grid-template-columns:' + fr + '">' + labels.map(function(c, i){ return '<span class="' + (i === cat ? "on" : "") + '">' + t(c) + '</span>'; }).join("") + '</div>';
+}
+function bcGoalHTML(M, diff){
+  var h = '<div class="bc-goalwrap"><p class="pg-note bc-hint">' + t("bcDrag") + '</p>' +
+    '<div class="bc-key"><span><i class="k-now"></i>' + t("bcYou") + '</span><span><i class="k-goal"></i>' + t("bcGoal") + '</span></div>';
+  if (M.lean) h += '<div class="bc-bmi"><div class="bc-bmi-h"><span>' + t("bcFatBar") + '</span><b class="num"><bdi dir="ltr">' + nf(M.fat) + '%</bdi></b>' + diff("fat") + '</div>' +
+    bcBarHTML(M, "fat", ["bcAth", "bcFit", "bcAvg", "bcHigh"], "bc-fatbar") + '</div>';
+  if (M.hm2) h += '<div class="bc-bmi"><div class="bc-bmi-h"><span>' + t("bcBmi") + '</span><b class="num"><bdi dir="ltr">' + nf(r1(M.bmi)) + '</bdi></b>' + diff("bmi") + '</div>' +
+    bcBarHTML(M, "bmi", ["bcUnder", "bcHealthy", "bcOver", "bcObese"], "") +
+    '<p class="pg-note bc-hw">' + bcFill("bcHealthyW", { a:'<bdi dir="ltr">' + Math.round(18.5 * M.hm2) + '</bdi>', b:'<bdi dir="ltr">' + Math.round(24.9 * M.hm2) + '</bdi>' }) + '</p></div>';
+  h += '<div class="bc-goal" id="bcOut" aria-live="polite"></div>' +
+    (M.lean ? '<p class="pg-note">' + bcFill("bcAssume", { n:'<bdi dir="ltr">' + nf(r1(M.lean)) + '</bdi>' }) + '</p>' : '') + '</div>';
+  return h;
+}
+function bcPaint(host, M){
+  host.querySelectorAll("[data-bcbar]").forEach(function(tr){
+    var kind = tr.dataset.bcbar, p = bcPct(M, kind), v = M.valAt(kind, M.W), hd = tr.querySelector(".bc-hd");
+    hd.style.left = p.toFixed(2) + "%";
+    hd.firstChild.textContent = kind === "fat" ? nf(r1(v)) + "%" : nf(r1(v));
+    tr.setAttribute("aria-valuetext", nf(r1(M.W)) + " kg");
+  });
+  var W = r1(M.W), L = r1(M.w - M.W), fat = M.fatAt(M.W), bmi = M.bmiAt(M.W);
+  var o = '<div class="bc-goal-h"><span>' + t("bcGoal") + ' · ' + t("bcTgtW") + '</span><b class="num"><bdi dir="ltr">' + nf(W) + ' kg</bdi></b></div>' +
+    '<p class="bc-goal-sub">' + [fat != null ? t("bcFat") + ' <bdi dir="ltr">' + nf(r1(fat)) + '%</bdi>' : "", bmi ? t("bcBmi") + ' <bdi dir="ltr">' + nf(r1(bmi)) + '</bdi>' : ""].filter(Boolean).join(" · ") + '</p>';
+  var low = fat != null && fat < M.F.ess;
+  if (low) o += '';
+  else if (L > 0.3){
+    var a = L / 1, b = L / 0.5, u = "bcWk", A, B;
+    if (b <= 12){ A = Math.max(1, Math.ceil(a)); B = Math.ceil(b); }
+    else { u = "bcMo"; A = Math.max(1, Math.round(a / 4.35)); B = Math.max(A, Math.round(b / 4.35)); }
+    o += '<p class="bc-goal-l">' + bcFill("bcLose", { n:'<bdi dir="ltr">' + nf(L) + '</bdi>' }) + '</p>' +
+      '<p class="pg-note">' + bcFill("bcTime", { a:'<bdi dir="ltr">' + A, b:B + '</bdi>', u:t(u) }) + '</p>';
+  } else if (L < -0.3) o += '<p class="bc-goal-l">' + bcFill("bcGain", { n:'<bdi dir="ltr">' + nf(-L) + '</bdi>' }) + '</p>';
+  else o += '<p class="bc-goal-l">' + t("bcKeep") + '</p>';
+  if (low) o += '<p class="pg-note bc-err">' + t("bcTooLow") + '</p>';
+  var out = host.querySelector("#bcOut"); if (out) out.innerHTML = o;
+}
+function bcWire(host, M){
+  var commit = function(){ state.bcTarget = r1(M.W); save(); };
+  host.querySelectorAll("[data-bcbar]").forEach(function(tr){
+    var kind = tr.dataset.bcbar, bar = tr.querySelector(".bc-bar"), R = M.range(kind), step = kind === "fat" ? 0.5 : 0.1, drag = false;
+    var setV = function(v){
+      v = Math.round(Math.max(R.min, Math.min(R.max, v)) / step) * step;
+      M.W = Math.max(M.lo, Math.min(M.hi, M.wFor(kind, v))); bcPaint(host, M);
+    };
+    var fromX = function(x){ var r = bar.getBoundingClientRect(); setV(R.min + Math.max(0, Math.min(1, (x - r.left) / r.width)) * (R.max - R.min)); };
+    tr.addEventListener("pointerdown", function(e){
+      if (e.button > 0) return; drag = true;
+      try { tr.setPointerCapture(e.pointerId); } catch (_) {}
+      tr.classList.add("on"); fromX(e.clientX);
+    });
+    tr.addEventListener("pointermove", function(e){ if (drag) fromX(e.clientX); });
+    var end = function(){ if (!drag) return; drag = false; tr.classList.remove("on"); commit(); };
+    tr.addEventListener("pointerup", end); tr.addEventListener("pointercancel", end); tr.addEventListener("lostpointercapture", end);
+    tr.addEventListener("keydown", function(e){
+      var d = e.key === "ArrowRight" || e.key === "ArrowUp" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowDown" ? -1 : 0;
+      if (!d) return; e.preventDefault();
+      setV(M.valAt(kind, M.W) + d * (kind === "fat" ? 1 : 0.5)); commit();
+    });
+  });
+  bcPaint(host, M);
+}
 function renderBody(){
   var host = document.getElementById("pgBody"); if (!host) return;
   var list = bodyList(), last = list[list.length - 1], prev = list[list.length - 2];
@@ -2675,13 +2775,8 @@ function renderBody(){
     var row = function(k, lbl, col){ return last[k] == null ? "" : '<li><i style="background:' + col + '"></i><span>' + t(lbl) + '</span><b class="num"><bdi dir="ltr">' + nf(last[k]) + '%</bdi></b>' + diff(k) + '</li>'; };
     h += '<div class="bc-top"><div><h3>' + t("bcLast") + ' <small>' + fmtDate(last.d) + '</small></h3><ul class="bc-leg">' +
       row("fat", "bcFat", "#F97316") + row("muscle", "bcMuscle", "#22C55E") + row("bone", "bcBone", "var(--ink)") + '</ul></div>' + bodyDonut(last) + '</div>';
-    if (last.bmi){
-      var b = last.bmi, pos = Math.max(2, Math.min(98, (b - 15) / (40 - 15) * 100)), cat = bmiCat(b);
-      var cats = ["bcUnder", "bcHealthy", "bcOver", "bcObese"];
-      h += '<div class="bc-bmi"><div class="bc-bmi-h"><span>' + t("bcBmi") + '</span><b class="num"><bdi dir="ltr">' + nf(b) + '</bdi></b>' + diff("bmi") + '</div>' +
-        '<div class="bc-bar" dir="ltr"><span class="bc-seg s0"></span><span class="bc-seg s1"></span><span class="bc-seg s2"></span><span class="bc-seg s3"></span><i style="left:' + pos.toFixed(1) + '%"></i></div>' +
-        '<div class="bc-cats" dir="ltr">' + cats.map(function(c, i){ return '<span class="' + (i === cat ? "on" : "") + '">' + t(c) + '</span>'; }).join("") + '</div></div>';
-    }
+    var BM = bcModel(last);
+    if (BM) h += bcGoalHTML(BM, diff);
     if (list.length > 1){
       h += '<details class="bc-hist"><summary>' + t("bcHist") + ' (' + list.length + ')</summary><ul>' + list.slice().reverse().map(function(x){
         var i = state.body.indexOf(x);
@@ -2697,6 +2792,7 @@ function renderBody(){
     '<button type="button" class="startbtn" id="bcSave">' + t("bcSave") + '</button></div>' +
     '<p class="pg-note">' + t("bcBmiAuto") + '</p><p class="pg-note bc-err" id="bcErr" hidden>' + t("bcErr") + '</p>';
   host.innerHTML = h;
+  if (last && BM) bcWire(host, BM);
   host.querySelectorAll("[data-bcdel]").forEach(function(bt){
     bt.addEventListener("click", function(){ state.body.splice(+bt.dataset.bcdel, 1); save(); renderBody(); });
   });
@@ -2715,7 +2811,7 @@ function renderBody(){
 }
 function bodyContext(){
   var l = bodyList().slice(-3);
-  return l.length ? "BODY COMPOSITION (smart scale): " + l.map(function(x){ return x.d + " fat " + (x.fat != null ? x.fat + "%" : "?") + ", muscle " + (x.muscle != null ? x.muscle + "%" : "?") + ", bone " + (x.bone != null ? x.bone + "%" : "?") + (x.bmi ? ", BMI " + x.bmi : ""); }).join(" | ") + "." : "";
+  return l.length ? "BODY COMPOSITION (smart scale): " + l.map(function(x){ return x.d + " fat " + (x.fat != null ? x.fat + "%" : "?") + ", muscle " + (x.muscle != null ? x.muscle + "%" : "?") + ", bone " + (x.bone != null ? x.bone + "%" : "?") + (x.bmi ? ", BMI " + x.bmi : ""); }).join(" | ") + "." + (state.bcTarget ? " Target weight the user set in the app: " + state.bcTarget + " kg." : "") : "";
 }
 
 function renderMeas(){

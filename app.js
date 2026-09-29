@@ -2637,11 +2637,87 @@ function renderProgress(){
   var p3 = document.getElementById("pgPh3");
   if (p3) p3.addEventListener("click", function(){ state.deload = false; setPhase(3); });
 
-  renderMeas(); renderPhotos(); renderReport(); renderData();
+  renderBody(); renderMeas(); renderPhotos(); renderReport(); renderData();
 }
 
 /* ---------------- 9) المقاسات ---------------- */
 var MS_KEYS = [["waist","msWaist"],["chest","msChest"],["arm","msArm"],["thigh","msThigh"],["hips","msHips"]];
+/* ---------------- تركيب الجسم (ميزان ذكي: دهون / عضل / عظم + BMI) ----------------
+   كل قياس ينحفظ في state.body على جهازك بس: { d, fat, muscle, bone, bmi } */
+function bodyList(){ return (state.body || []).slice().sort(function(a, b){ return a.d < b.d ? -1 : 1; }); }
+function bmiNow(){
+  var h = +PROF().height, w = latestWeight() || +PROF().weight;
+  return h > 100 && w > 30 ? r1(w / Math.pow(h / 100, 2)) : null;
+}
+function bmiCat(b){ return b < 18.5 ? 0 : b < 25 ? 1 : b < 30 ? 2 : 3; }
+function bodyDonut(x){
+  var parts = [[x.fat, "#F97316"], [x.muscle, "#22C55E"], [x.bone, "var(--ink)"]].filter(function(p){ return p[0] > 0; });
+  var tot = parts.reduce(function(s, p){ return s + p[0]; }, 0) || 1, R = 42, C = 2 * Math.PI * R, off = 0;
+  var arcs = parts.map(function(p){
+    var len = p[0] / tot * C, a = '<circle cx="60" cy="60" r="' + R + '" fill="none" stroke="' + p[1] + '" stroke-width="14" stroke-dasharray="' + len.toFixed(2) + ' ' + (C - len).toFixed(2) + '" stroke-dashoffset="' + (-off).toFixed(2) + '"/>';
+    off += len; return a;
+  }).join("");
+  return '<svg class="bc-donut" viewBox="0 0 120 120" aria-hidden="true"><g transform="rotate(-90 60 60)"><circle cx="60" cy="60" r="' + R + '" fill="none" stroke="var(--line)" stroke-width="14"/>' + arcs + '</g></svg>';
+}
+function renderBody(){
+  var host = document.getElementById("pgBody"); if (!host) return;
+  var list = bodyList(), last = list[list.length - 1], prev = list[list.length - 2];
+  var inp = function(k, lbl, ph){ return '<label><span>' + t(lbl) + '</span><input type="number" inputmode="decimal" step="0.1" min="0" max="100" data-bc="' + k + '" placeholder="' + ph + '"></label>'; };
+  var h = '';
+  if (!last) h += '<p class="pg-note">' + t("bcEmpty") + '</p>';
+  else {
+    var diff = function(k){
+      if (!prev || prev[k] == null || last[k] == null) return "";
+      var d = r1(last[k] - prev[k]); if (!d) return "";
+      var good = k === "fat" || k === "bmi" ? d < 0 : d > 0;
+      return ' <small class="bc-d ' + (good ? "up" : "down") + '"><bdi dir="ltr">' + (d > 0 ? "+" : "") + nf(d) + '</bdi></small>';
+    };
+    var row = function(k, lbl, col){ return last[k] == null ? "" : '<li><i style="background:' + col + '"></i><span>' + t(lbl) + '</span><b class="num"><bdi dir="ltr">' + nf(last[k]) + '%</bdi></b>' + diff(k) + '</li>'; };
+    h += '<div class="bc-top"><div><h3>' + t("bcLast") + ' <small>' + fmtDate(last.d) + '</small></h3><ul class="bc-leg">' +
+      row("fat", "bcFat", "#F97316") + row("muscle", "bcMuscle", "#22C55E") + row("bone", "bcBone", "var(--ink)") + '</ul></div>' + bodyDonut(last) + '</div>';
+    if (last.bmi){
+      var b = last.bmi, pos = Math.max(2, Math.min(98, (b - 15) / (40 - 15) * 100)), cat = bmiCat(b);
+      var cats = ["bcUnder", "bcHealthy", "bcOver", "bcObese"];
+      h += '<div class="bc-bmi"><div class="bc-bmi-h"><span>' + t("bcBmi") + '</span><b class="num"><bdi dir="ltr">' + nf(b) + '</bdi></b>' + diff("bmi") + '</div>' +
+        '<div class="bc-bar" dir="ltr"><span class="bc-seg s0"></span><span class="bc-seg s1"></span><span class="bc-seg s2"></span><span class="bc-seg s3"></span><i style="left:' + pos.toFixed(1) + '%"></i></div>' +
+        '<div class="bc-cats" dir="ltr">' + cats.map(function(c, i){ return '<span class="' + (i === cat ? "on" : "") + '">' + t(c) + '</span>'; }).join("") + '</div></div>';
+    }
+    if (list.length > 1){
+      h += '<details class="bc-hist"><summary>' + t("bcHist") + ' (' + list.length + ')</summary><ul>' + list.slice().reverse().map(function(x){
+        var i = state.body.indexOf(x);
+        return '<li><span>' + fmtDate(x.d) + '</span><bdi dir="ltr">' + [x.fat != null ? x.fat + "%" : "–", x.muscle != null ? x.muscle + "%" : "–", x.bone != null ? x.bone + "%" : "–", x.bmi ? "BMI " + x.bmi : ""].join(" · ") + '</bdi>' +
+          '<button type="button" class="ai-ib" data-bcdel="' + i + '" aria-label="' + t("remove") + '">×</button></li>';
+      }).join("") + '</ul></details>';
+    }
+  }
+  var auto = bmiNow();
+  h += '<div class="bc-form"><label><span>' + t("bcDate") + '</span><input type="date" id="bcD" value="' + todayISO() + '" max="' + todayISO() + '"></label>' +
+    inp("fat", "bcFat", "38") + inp("muscle", "bcMuscle", "59") + inp("bone", "bcBone", "3") +
+    '<label><span>' + t("bcBmi") + '</span><input type="number" inputmode="decimal" step="0.1" min="10" max="60" data-bc="bmi" placeholder="' + (auto || "28.1") + '"></label>' +
+    '<button type="button" class="startbtn" id="bcSave">' + t("bcSave") + '</button></div>' +
+    '<p class="pg-note">' + t("bcBmiAuto") + '</p><p class="pg-note bc-err" id="bcErr" hidden>' + t("bcErr") + '</p>';
+  host.innerHTML = h;
+  host.querySelectorAll("[data-bcdel]").forEach(function(bt){
+    bt.addEventListener("click", function(){ state.body.splice(+bt.dataset.bcdel, 1); save(); renderBody(); });
+  });
+  document.getElementById("bcSave").addEventListener("click", function(){
+    var rec = { d:document.getElementById("bcD").value || todayISO() }, any = false;
+    host.querySelectorAll("[data-bc]").forEach(function(i){
+      var v = numIn(i.value), k = i.dataset.bc;
+      if (v == null) return;
+      if (k === "bmi" ? (v >= 10 && v <= 60) : (v >= 0 && v <= 100)){ rec[k] = r1(v); if (k !== "bmi") any = true; }
+    });
+    if (!any){ document.getElementById("bcErr").hidden = false; return; }
+    if (rec.bmi == null && auto) rec.bmi = auto;
+    state.body = (state.body || []).filter(function(x){ return x.d !== rec.d; });
+    state.body.push(rec); save(); renderBody();
+  });
+}
+function bodyContext(){
+  var l = bodyList().slice(-3);
+  return l.length ? "BODY COMPOSITION (smart scale): " + l.map(function(x){ return x.d + " fat " + (x.fat != null ? x.fat + "%" : "?") + ", muscle " + (x.muscle != null ? x.muscle + "%" : "?") + ", bone " + (x.bone != null ? x.bone + "%" : "?") + (x.bmi ? ", BMI " + x.bmi : ""); }).join(" | ") + "." : "";
+}
+
 function renderMeas(){
   var host = document.getElementById("pgMeas"), list = (state.meas || []).slice().sort(function(a, b){ return a.d < b.d ? -1 : 1; });
   var last = list[list.length - 1] || {}, first = list[0] || {};
@@ -3313,6 +3389,7 @@ function aiContext(){
   L.push("LOGGED TODAY (" + td.date + "): " + (eaten.length ? eaten.join(", ") : "nothing yet") + " = " + P + " g protein, " + K + " kcal. Water: " + (td.water || 0) + " of 12 glasses (250 ml).");
   var w = (state.weights || []).slice(-8);
   L.push(historyContext());
+  if (bodyContext()) L.push(bodyContext());
   L.push("BODY WEIGHT LOG: " + (w.length ? w.map(function(r){ return r.d + " " + r.kg + " kg"; }).join(", ") : "no entries yet") + ".");
   return L.join("\n");
 }

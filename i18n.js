@@ -951,3 +951,46 @@ Object.assign(window.I18N.en, {
   };
   Object.keys(K).forEach(function(l){ if (window.I18N[l]) Object.assign(window.I18N[l], K[l]); });
 })();
+
+/* تركيب الجسم */
+(function(){
+  var K = {
+    ar:{ bcTitle:"تركيب الجسم", bcText:"من الميزان الذكي في النادي: نسبة الدهون والعضل والعظم. قيس بنفس الميزان وبنفس الوقت عشان المقارنة تكون صح.",
+      bcFat:"دهون", bcMuscle:"عضل", bcBone:"عظم", bcBmi:"BMI", bcDate:"التاريخ", bcSave:"احفظ القياس", bcLast:"آخر قياس",
+      bcEmpty:"ما فيه قياسات للحين. دخّل أرقام الميزان تحت.", bcUnder:"نحافة", bcHealthy:"صحي", bcOver:"وزن زايد", bcObese:"سمنة",
+      bcHist:"كل القياسات", bcBmiAuto:"لو تركت BMI فاضي نحسبه من وزنك وطولك.", bcErr:"دخّل رقم واحد على الأقل (دهون أو عضل أو عظم)." },
+    nl:{ bcTitle:"Lichaamssamenstelling", bcText:"Van de slimme weegschaal in de sportschool: vet-, spier- en botmassa. Meet steeds op dezelfde weegschaal en hetzelfde moment.",
+      bcFat:"Vetmassa", bcMuscle:"Spiermassa", bcBone:"Botmassa", bcBmi:"BMI", bcDate:"Datum", bcSave:"Meting opslaan", bcLast:"Laatste meting",
+      bcEmpty:"Nog geen metingen. Vul hieronder de waarden van de weegschaal in.", bcUnder:"Ondergewicht", bcHealthy:"Gezond", bcOver:"Overgewicht", bcObese:"Obesitas",
+      bcHist:"Alle metingen", bcBmiAuto:"Laat je BMI leeg, dan berekenen we het uit je gewicht en lengte.", bcErr:"Vul minstens één waarde in (vet, spier of bot)." },
+    en:{ bcTitle:"Body composition", bcText:"From the gym's smart scale: fat, muscle and bone mass. Measure on the same scale at the same time of day.",
+      bcFat:"Fat", bcMuscle:"Muscle", bcBone:"Bone", bcBmi:"BMI", bcDate:"Date", bcSave:"Save measurement", bcLast:"Latest measurement",
+      bcEmpty:"No measurements yet. Enter the scale values below.", bcUnder:"Underweight", bcHealthy:"Healthy", bcOver:"Overweight", bcObese:"Obese",
+      bcHist:"All measurements", bcBmiAuto:"Leave BMI empty and we'll calculate it from your weight and height.", bcErr:"Enter at least one value (fat, muscle or bone)." },
+    tr:{ bcTitle:"Vücut kompozisyonu", bcText:"Salondaki akıllı tartıdan: yağ, kas ve kemik oranı. Hep aynı tartıda ve aynı saatte ölç.",
+      bcFat:"Yağ", bcMuscle:"Kas", bcBone:"Kemik", bcBmi:"BMI", bcDate:"Tarih", bcSave:"Ölçümü kaydet", bcLast:"Son ölçüm",
+      bcEmpty:"Henüz ölçüm yok. Tartı değerlerini aşağıya gir.", bcUnder:"Zayıf", bcHealthy:"Sağlıklı", bcOver:"Fazla kilolu", bcObese:"Obez",
+      bcHist:"Tüm ölçümler", bcBmiAuto:"BMI'yi boş bırakırsan kilo ve boyundan hesaplarız.", bcErr:"En az bir değer gir (yağ, kas veya kemik)." },
+    de:{ bcTitle:"Körperzusammensetzung", bcText:"Von der smarten Waage im Gym: Fett-, Muskel- und Knochenanteil. Miss immer auf derselben Waage zur selben Tageszeit.",
+      bcFat:"Fett", bcMuscle:"Muskeln", bcBone:"Knochen", bcBmi:"BMI", bcDate:"Datum", bcSave:"Messung speichern", bcLast:"Letzte Messung",
+      bcEmpty:"Noch keine Messungen. Trag unten die Werte der Waage ein.", bcUnder:"Untergewicht", bcHealthy:"Gesund", bcOver:"Übergewicht", bcObese:"Adipositas",
+      bcHist:"Alle Messungen", bcBmiAuto:"Lässt du BMI leer, berechnen wir ihn aus Gewicht und Größe.", bcErr:"Gib mindestens einen Wert ein (Fett, Muskeln oder Knochen)." },
+    fr:{ bcTitle:"Composition corporelle", bcText:"Depuis la balance connectée de la salle : masse grasse, musculaire et osseuse. Mesure-toi sur la même balance au même moment.",
+      bcFat:"Graisse", bcMuscle:"Muscle", bcBone:"Os", bcBmi:"IMC", bcDate:"Date", bcSave:"Enregistrer", bcLast:"Dernière mesure",
+      bcEmpty:"Pas encore de mesure. Saisis les valeurs de la balance ci-dessous.", bcUnder:"Maigreur", bcHealthy:"Normal", bcOver:"Surpoids", bcObese:"Obésité",
+      bcHist:"Toutes les mesures", bcBmiAuto:"Laisse l'IMC vide et on le calcule avec ton poids et ta taille.", bcErr:"Saisis au moins une valeur (graisse, muscle ou os)." },
+    es:{ bcTitle:"Composición corporal", bcText:"De la báscula inteligente del gimnasio: masa grasa, muscular y ósea. Mídete en la misma báscula y a la misma hora.",
+      bcFat:"Grasa", bcMuscle:"Músculo", bcBone:"Hueso", bcBmi:"IMC", bcDate:"Fecha", bcSave:"Guardar medición", bcLast:"Última medición",
+      bcEmpty:"Aún no hay mediciones. Introduce los valores de la báscula abajo.", bcUnder:"Bajo peso", bcHealthy:"Saludable", bcOver:"Sobrepeso", bcObese:"Obesidad",
+      bcHist:"Todas las mediciones", bcBmiAuto:"Si dejas el IMC vacío, lo calculamos con tu peso y altura.", bcErr:"Introduce al menos un valor (grasa, músculo o hueso)." },
+    pt:{ bcTitle:"Composição corporal", bcText:"Da balança inteligente da academia: massa gorda, muscular e óssea. Meça sempre na mesma balança e no mesmo horário.",
+      bcFat:"Gordura", bcMuscle:"Músculo", bcBone:"Osso", bcBmi:"IMC", bcDate:"Data", bcSave:"Salvar medição", bcLast:"Última medição",
+      bcEmpty:"Ainda sem medições. Digite os valores da balança abaixo.", bcUnder:"Abaixo do peso", bcHealthy:"Saudável", bcOver:"Sobrepeso", bcObese:"Obesidade",
+      bcHist:"Todas as medições", bcBmiAuto:"Se deixar o IMC vazio, calculamos pelo seu peso e altura.", bcErr:"Digite pelo menos um valor (gordura, músculo ou osso)." },
+    zh:{ bcTitle:"身体成分", bcText:"来自健身房智能体脂秤：脂肪、肌肉和骨量。请在同一台秤、同一时间测量。",
+      bcFat:"脂肪", bcMuscle:"肌肉", bcBone:"骨量", bcBmi:"BMI", bcDate:"日期", bcSave:"保存测量", bcLast:"最近一次测量",
+      bcEmpty:"还没有测量记录。请在下方输入体脂秤的数据。", bcUnder:"偏瘦", bcHealthy:"正常", bcOver:"超重", bcObese:"肥胖",
+      bcHist:"全部测量", bcBmiAuto:"BMI 留空时将根据你的体重和身高计算。", bcErr:"请至少输入一个数值（脂肪、肌肉或骨量）。" }
+  };
+  Object.keys(K).forEach(function(l){ if (window.I18N[l]) Object.assign(window.I18N[l], K[l]); });
+})();

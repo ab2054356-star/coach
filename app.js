@@ -498,58 +498,90 @@ function ex(id, ar, en, muscle, key, muscles, sets, reps, rest, cue, p2, note){
            sets:sets, reps:reps, rest:rest, cue:cue, p2:p2 || null, note:note || null };
 }
 
+/* تمرين من المكتبة داخل الخطة الأساسية (الفيديو والأسماء من المكتبة، والشرح من هنا) */
+function lx(id, n, sets, reps, rest, cue, note, lbl){
+  var e = libEx(n, { sets:sets, reps:reps, rest:rest }, id); if (!e) return null;
+  e.cue = cue; e.cueI = null; e.p2 = null; e.base = true; e.note = note || null; if (lbl) e.muscle = lbl;
+  LANGS.forEach(function(l){
+    var X = ((window.LX_TR || {})[l] || {})[id], T = ((window.TRX || {})[l] || {})[id];
+    if (X && T) Object.assign(T, X);
+  });
+  return e;
+}
 var DAYS = [
-  { key:"A", name:"علوي — دفع", focus:"صدر · كتف · ترايسبس", rest:false, ex:[
+  { key:"A", name:"علوي 1 — قوة", focus:"صدر · ظهر · كتف · ذراع", rest:false, ex:[
     ex("a1","ضغط صدر بالدمبل","Dumbbell bench press","صدر","bench",["chest","shoulders","triceps"],3,"10","90",
        "اسحب لوحي الكتف للخلف وثبّتهما على البنش، والمرفق بزاوية 45° من الجسم لا 90°.",
+       {sets:4,reps:"6–8",rest:"120"}),
+    ex("c1","سحب أمامي على البكرة","Lat pulldown","ظهر عريض","pulldown",["lats","biceps"],3,"10","90",
+       "اسحب البار إلى أعلى الصدر، وابدأ السحبة من المرفق لا من اليد.",
        {sets:4,reps:"6–8",rest:"120"}),
     ex("a2","ضغط كتف جلوس","Seated dumbbell press","كتف","ohp",["shoulders","triceps"],3,"10","90",
        "لا تقوّس ظهرك للخلف — شد البطن وخلّ القفص الصدري نازلاً.",
        {sets:4,reps:"6–8",rest:"120"}),
-    ex("a3","ضغط صدر علوي","Incline dumbbell press","صدر علوي","incline",["chest","shoulders","triceps"],3,"12","60",
-       "المقعد على ميلان 30°، ولا تفرد المرفق بقفل في نهاية الدفعة."),
-    ex("a4","رفع جانبي","Lateral raise","كتف جانبي","lateral",["shoulders"],3,"15","45",
-       "ارفع إلى مستوى الكتف فقط، بوزن خفيف وبدون تأرجح من الظهر."),
-    ex("a5","ترايسبس بالحبل","Rope triceps pushdown","ترايسبس","pushdown",["triceps"],3,"12","45",
-       "ثبّت المرفق بجانب جسمك — الحركة من الساعد فقط."),
-    ex("a6","بلانك","Plank","بطن · استقرار","plank",["abs"],3,"30ث","45",
-       "خط مستقيم من الرأس للكعب، ولا ترفع الورك للأعلى.")
-  ]},
-  { key:"B", name:"سفلي", focus:"رباعية · مأبضية · ألية", rest:false, ex:[
-    ex("b1","سكوات Goblet","Goblet squat","رباعية · ألية","squat",["quads","glutes"],3,"10","120",
-       "انزل إلى عمق مريح للركبة، والركبة تتبع اتجاه أصابع القدم لا للداخل.",
-       {sets:4,reps:"6–8",rest:"120"}),
-    ex("b2","ضغط الأرجل","Leg press","رباعية · ألية","legpress",["quads","glutes"],3,"12","90",
-       "لا تفرد الركبة تماماً في الأعلى، ولا ترفع أسفل ظهرك عن المقعد.",
-       {sets:4,reps:"8–10",rest:"120"}),
-    ex("b3","رفعة رومانية بالدمبل","Romanian deadlift","مأبضية · ألية","hinge",["hamstrings","glutes","lowerback"],3,"10","90",
-       "ادفع الورك للخلف والظهر مستقيم؛ توقف عند ما تحس شد المأبضية."),
-    ex("b4","ثني الساق","Lying leg curl","مأبضية","legcurl",["hamstrings"],3,"12","60",
-       "مهم جداً لك — المأبضية القوية تحمي الرباط الصليبي. نزّل الوزن ببطء 3 ثوانٍ."),
-    ex("b5","تمديد الساق","Leg extension","رباعية","legext",["quads"],3,"15","60",
-       "وزن خفيف وتكرار عالٍ؛ إذا حسست بشد أمام الركبة قلل المدى."),
-    ex("b6","سمانة وقوف","Standing calf raise","سمانة","calf",["calves"],3,"15","45",
-       "ارفع للأعلى كامل وانزل ببطء حتى تحس تمدد السمانة.")
-  ]},
-  { key:"R1", name:"راحة", focus:"مشي 30 دقيقة", rest:true, ex:[] },
-  { key:"C", name:"علوي — سحب", focus:"ظهر · بايسبس · كتف خلفي", rest:false, ex:[
-    ex("c1","سحب أمامي على البكرة","Lat pulldown","ظهر عريض","pulldown",["lats","biceps"],3,"10","90",
-       "اسحب البار إلى أعلى الصدر، وابدأ السحبة من المرفق لا من اليد.",
-       {sets:4,reps:"6–8",rest:"120"}),
     ex("c2","تجديف جلوس بالكابل","Seated cable row","ظهر أوسط","srow",["lats","traps","biceps"],3,"12","90",
        "الصدر مرفوع والظهر ثابت — الحركة من الذراعين فقط.",
        {sets:4,reps:"8–10",rest:"120"}),
-    ex("c3","تجديف بالدمبل بذراع واحدة","One-arm dumbbell row","ظهر","row1",["lats","traps","biceps"],3,"10","60",
-       "ظهر مسطح وموازٍ للأرض، والمرفق يمر قريباً من الجنب.", null, "لكل جهة"),
-    ex("c4","رفرفة خلفية","Rear delt fly","كتف خلفي","revfly",["reardelts","traps"],3,"15","45",
-       "انحنِ من الورك وافتح الذراعين للجانبين بوزن خفيف."),
     ex("c5","بايسبس بالدمبل","Dumbbell curl","بايسبس","curl",["biceps"],3,"12","45",
        "المرفق ثابت بجانب الجسم، وبدون دفع من الظهر."),
+    ex("a5","ترايسبس بالحبل","Rope triceps pushdown","ترايسبس","pushdown",["triceps"],3,"12","45",
+       "ثبّت المرفق بجانب جسمك — الحركة من الساعد فقط.")
+  ]},
+  { key:"B", name:"أرجل", focus:"رباعية · مأبضية · سمانة", rest:false, ex:[
+    ex("b1","سكوات Goblet","Goblet squat","رباعية · ألية","squat",["quads","glutes"],3,"10","120",
+       "انزل إلى عمق مريح للركبة، والركبة تتبع اتجاه أصابع القدم لا للداخل.",
+       {sets:4,reps:"6–8",rest:"120"}),
+    ex("b3","رفعة رومانية بالدمبل","Romanian deadlift","مأبضية · ألية","hinge",["hamstrings","glutes","lowerback"],3,"10","90",
+       "ادفع الورك للخلف والظهر مستقيم؛ توقف عند ما تحس شد المأبضية."),
+    ex("b2","ضغط الأرجل","Leg press","رباعية · ألية","legpress",["quads","glutes"],3,"12","90",
+       "لا تفرد الركبة تماماً في الأعلى، ولا ترفع أسفل ظهرك عن المقعد.",
+       {sets:4,reps:"8–10",rest:"120"}),
+    ex("b4","ثني الساق","Lying leg curl","مأبضية","legcurl",["hamstrings"],3,"12","60",
+       "مهم جداً لك — المأبضية القوية تحمي الرباط الصليبي. نزّل الوزن ببطء 3 ثوانٍ."),
+    ex("b6","سمانة وقوف","Standing calf raise","سمانة","calf",["calves"],3,"15","45",
+       "ارفع للأعلى كامل وانزل ببطء حتى تحس تمدد السمانة."),
+    ex("a6","بلانك","Plank","بطن · استقرار","plank",["abs"],3,"30ث","45",
+       "خط مستقيم من الرأس للكعب، ولا ترفع الورك للأعلى.")
+  ]},
+  { key:"R1", name:"راحة", focus:"مشي 30 دقيقة", rest:true, ex:[] },
+  { key:"C", name:"علوي 2 — حجم", focus:"صدر علوي · ظهر · كتف · ذراع", rest:false, ex:[
+    ex("a3","ضغط صدر علوي","Incline dumbbell press","صدر علوي","incline",["chest","shoulders","triceps"],3,"12","60",
+       "المقعد على ميلان 30°، ولا تفرد المرفق بقفل في نهاية الدفعة."),
+    ex("c3","تجديف بالدمبل بذراع واحدة","One-arm dumbbell row","ظهر","row1",["lats","traps","biceps"],3,"10","60",
+       "ظهر مسطح وموازٍ للأرض، والمرفق يمر قريباً من الجنب.", null, "لكل جهة"),
+    ex("a4","رفع جانبي","Lateral raise","كتف جانبي","lateral",["shoulders"],3,"15","45",
+       "ارفع إلى مستوى الكتف فقط، بوزن خفيف وبدون تأرجح من الظهر."),
     ex("c6","Face pull بالحبل","Face pull","كتف خلفي","facepull",["reardelts","traps"],3,"15","45",
-       "الحبل على مستوى الوجه، وافتح اليدين للخارج عند السحب.")
+       "الحبل على مستوى الوجه، وافتح اليدين للخارج عند السحب."),
+    lx("c7", 5, 3, "10–12", "60", "الإبهام لفوق طول الحركة والمرفق ثابت بجانب جسمك — يشغّل البايسبس والساعد مع بعض."),
+    lx("c8", 20, 3, "10–12", "60", "المرفق قريب من راسك وثابت، وافرد ذراعك لفوق بالكامل — يمدّد الرأس الطويل للترايسبس.")
   ]},
   { key:"R2", name:"راحة", focus:"استشفاء", rest:true, ex:[] },
-  { key:"D", name:"سفلي + بطن", focus:"ألية · رباعية · جذع", rest:false, ex:[
+  { key:"D", name:"ذراع وسواعد", focus:"بايسبس · ترايسبس · سواعد", rest:false, ex:[
+    lx("f1", 246, 3, "10–12", "60", "ذراعك ملتصقة بالمسند، ونزّل ببطء لين تقريباً تفرد بدون ما تقفل المرفق."),
+    lx("f2", 133, 3, "10–12", "60", "نزّل الدمبل جنب راسك والمرفق يأشر للسقف — الحركة من المرفق بس."),
+    lx("f3", 22, 3, "10–12", "60", "البنش على 45° وخلّ ذراعك تتدلى ورا جسمك، وارفع بدون ما تقدّم كتفك."),
+    lx("f4", 176, 3, "10–15", "60", "ظهرك قريب من البنش، انزل لين المرفق 90° بس، وادفع من كفوفك."),
+    lx("f5", 336, 3, "12–15", "45", "قبضة من فوق (الكف للأرض) والمرفق ثابت — يشغّل السواعد من فوق."),
+    lx("f6", 227, 3, "15–20", "45", "ساعدك على البنش والرسغ برا الحافة، ارفع بالرسغ بس ونزّل ببطء."),
+    ex("f7","مشي المزارع","Farmer walk","قبضة · سواعد","walk",["forearms","traps"],3,"30م","60",
+       "امسك دمبلين ثقال وامشِ بخطوة ثابتة وكتفك لورا — يقوّي القبضة والسواعد.")
+  ]},
+  { key:"E", name:"بطن وخصر وأفخاذ", focus:"بطن · جوانب · فخذ داخلي وخارجي", rest:false, ex:[
+    lx("g1", 88, 3, "12–15", "60", "ضم رجلينك ببطء، ووقف ثانية لما يتلامسون، وارجع بتحكم.", null, "فخذ داخلي"),
+    lx("g2", 52, 3, "12–15", "60", "افتح رجلينك للخارج وظهرك ملتصق بالمسند، ووقف ثانية في الآخر.", null, "فخذ خارجي · ألية"),
+    ex("d5","Cable crunch","Cable crunch","بطن","crunch",["abs"],3,"15","45",
+       "قوّس الظهر العلوي للأمام؛ الحركة من البطن لا من الورك."),
+    lx("g3", 59, 3, "10–15", "45", "ارفع ركبك لصدرك بدون تأرجح، ونزّل ببطء."),
+    lx("g4", 263, 3, "12", "45", "لف من الجذع وذراعك مفرودة والورك ثابت — للجوانب (الخصر).", "لكل جهة", "جوانب البطن"),
+    ex("e3","بلانك جانبي","Side plank","جذع جانبي","splank",["abs"],3,"20ث","45",
+       "الورك مرفوع وخط الجسم مستقيم من الكتف للكعب.", null, "لكل جهة")
+  ]}
+];
+/* تمارين مو في الخطة الحالية بس تحتاجها خطة 3 أيام وبدائل الإصابات */
+var EX_POOL = [
+    ex("b5","تمديد الساق","Leg extension","رباعية","legext",["quads"],3,"15","60",
+       "وزن خفيف وتكرار عالٍ؛ إذا حسست بشد أمام الركبة قلل المدى."),
     ex("d1","دفع الحوض","Hip thrust","ألية","thrust",["glutes","hamstrings"],3,"12","90",
        "ادفع من الكعب، واضغط الألية في الأعلى ثانية كاملة.",
        {sets:4,reps:"8–10",rest:"120"}),
@@ -560,23 +592,18 @@ var DAYS = [
        "القدم أعلى على اللوح يشغّل الألية أكثر ويريح الركبة."),
     ex("d4","ثني الساق جلوس","Seated leg curl","مأبضية","legcurl2",["hamstrings"],3,"12","60",
        "نزّل الوزن ببطء — الجزء النازل هو أهم جزء للحماية."),
-    ex("d5","Cable crunch","Cable crunch","بطن","crunch",["abs"],3,"15","45",
-       "قوّس الظهر العلوي للأمام؛ الحركة من البطن لا من الورك."),
     ex("d6","Dead bug","Dead bug","بطن عميق","deadbug",["abs"],3,"10","45",
-       "أسفل ظهرك ملتصق بالأرض طول الحركة — إذا ارتفع، قصّر المدى.", null, "لكل جهة")
-  ]},
-  { key:"E", name:"اختياري", focus:"كارديو + نقاط ضعف", rest:false, ex:[
+       "أسفل ظهرك ملتصق بالأرض طول الحركة — إذا ارتفع، قصّر المدى.", null, "لكل جهة"),
+    ex("c4","رفرفة خلفية","Rear delt fly","كتف خلفي","revfly",["reardelts","traps"],3,"15","45",
+       "انحنِ من الورك وافتح الذراعين للجانبين بوزن خفيف."),
     ex("e1","دراجة ثابتة","Cycling","كارديو","bike",["quads","calves"],1,"20د","—",
        "نفس معتدل — تقدر تتكلم بجمل قصيرة وأنت تمرّن."),
     ex("e2","Face pull بالحبل","Face pull","كتف خلفي","facepull",["reardelts","traps"],3,"15","45",
        "مهم لتصحيح وضعية الكتف بعد ساعات الجلوس أمام الشاشة."),
-    ex("e3","بلانك جانبي","Side plank","جذع جانبي","splank",["abs"],3,"20ث","45",
-       "الورك مرفوع وخط الجسم مستقيم من الكتف للكعب.", null, "لكل جهة"),
-    ex("e6","ضغط","Push-up","صدر","pushup",["chest","shoulders","triceps"],3,"8–12","60",
-       "جسمك خط مستقيم من الرأس للكعب، واليدين أعرض من الكتف بشوي. إذا ما قدرت 8 نظيفة، سوّها على ركبك."),
     ex("e5","مشي المزارع","Farmer walk","قبضة · جذع","walk",["traps","forearms","abs"],3,"30م","60",
-       "كتف للخلف وخطوة ثابتة — أضفه من الأسبوع الخامس.")
-  ]}
+       "كتف للخلف وخطوة ثابتة — أضفه من الأسبوع الخامس."),
+    ex("e6","ضغط","Push-up","صدر","pushup",["chest","shoulders","triceps"],3,"8–12","60",
+       "جسمك خط مستقيم من الرأس للكعب، واليدين أعرض من الكتف بشوي. إذا ما قدرت 8 نظيفة، سوّها على ركبك.")
 ];
 
 
@@ -612,8 +639,10 @@ var MUSCLE_TIERS = {
   pushup:{p:["chest"],s:["shoulders","triceps"],st:["abs"]},
   walk:{p:["forearms","traps"],s:["abs"],st:["quads","glutes","calves"]}
 };
-DAYS.forEach(function(d){
+DAYS = DAYS.map(function(d){ return Object.assign({}, d, { ex:d.ex.filter(Boolean) }); });
+DAYS.concat([{ ex:EX_POOL }]).forEach(function(d){
   d.ex.forEach(function(e){
+    if (e.lib != null) return;
     var t = MUSCLE_TIERS[e.key];
     e.muscles = t ? t.p : e.muscles;
     e.sec = t ? t.s : [];
@@ -623,7 +652,7 @@ DAYS.forEach(function(d){
 
 /* البرنامج حسب الملف: عدد الأيام + تبديل التمارين حسب الإصابة */
 var BASE_DAYS = DAYS;
-function exById(id){ var r = null; BASE_DAYS.forEach(function(d){ d.ex.forEach(function(x){ if (x.id === id) r = x; }); }); return r; }
+function exById(id){ var r = null; BASE_DAYS.concat([{ ex:EX_POOL }]).forEach(function(d){ d.ex.forEach(function(x){ if (x.id === id) r = x; }); }); return r; }
 function dayById(k){ for (var i = 0; i < BASE_DAYS.length; i++) if (BASE_DAYS[i].key === k) return BASE_DAYS[i]; return null; }
 function cloneEx(src, id){
   var c = Object.assign({}, src, { id:id, tid:src.id });
@@ -644,7 +673,7 @@ function buildDays(){
     ];
   } else if (n === 5){
     list = [dayById("A"), dayById("B"), dayById("R1"), dayById("C"), dayById("D"),
-            { key:"E5", name:"اليوم الخامس", focus:"كارديو + نقاط ضعف", rest:false, ex:dayById("E").ex }, dayById("R2")];
+            { key:"E5", name:"بطن وخصر وأفخاذ", focus:"بطن · جوانب · فخذ داخلي وخارجي", rest:false, ex:dayById("E").ex }, dayById("R2")];
   } else list = BASE_DAYS.slice();
   DAYS = list.map(function(d){
     if (d.rest) return d;
@@ -845,7 +874,7 @@ function buildGrid(){
     });
 
     if (EDIT) card.appendChild(editTools(e));
-    if (e.lib != null && !e.orig && !EDIT){ var lt = document.createElement("span"); lt.className = "libtag"; lt.textContent = t("libTag"); stage.appendChild(lt); }
+    if (e.lib != null && !e.orig && !EDIT && !e.base){ var lt = document.createElement("span"); lt.className = "libtag"; lt.textContent = t("libTag"); stage.appendChild(lt); }
     grid.appendChild(card);
   });
   if (EDIT) grid.appendChild(editAddTile());
